@@ -1,0 +1,8 @@
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\TizenSensor.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\Tizen.Wearable.CircularUI.Forms.Renderer.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\Tizen.Wearable.CircularUI.Forms.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\Xamarin.Forms.Core.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\Xamarin.Forms.Platform.Tizen.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\Xamarin.Forms.Platform.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\Xamarin.Forms.Xaml.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\publish\TizenSensor.deps.json

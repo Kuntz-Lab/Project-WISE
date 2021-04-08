@@ -1,0 +1,49 @@
+@font-face {
+  font-family: 'Breeze Sans';
+  font-weight: normal;
+  font-style: normal;
+  src: url('../data/fonts/BreezeSans-LightCondensed.ttf');
+}
+
+@font-face {
+  font-family: 'Breeze Sans';
+  font-weight: bold;
+  font-style: normal;
+  src: url('../data/fonts/BreezeSans-MediumCondensed.ttf');
+}
+
+* {
+  font-family: 'Breeze Sans' !important;
+  padding: 0px;
+  margin: 6px;
+}
+
+.mini-button {
+  color: #606060;
+  cursor: pointer;
+}
+
+body {
+  background-color: #101010;
+  color: white;
+  font-size: larger;
+  text-align: center;
+  padding-top: 36px;
+  user-select: none;
+}
+
+.hidden {
+  display: none;
+}
+
+#addr-label {
+  font-weight: bold;
+  user-select: all;
+}
+
+#start-button {
+  padding: 48px;
+  font-size: x-large;
+  pointer-events: all;
+  cursor: not-allowed;
+}

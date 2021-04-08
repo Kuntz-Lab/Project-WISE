@@ -1,0 +1,83 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\null\\Pictures\\Personal\\SideProjects\\WearableML\\TizenSensor\\TizenSensor.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\null\\Pictures\\Personal\\SideProjects\\WearableML\\TizenSensor\\TizenSensor.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\null\\Pictures\\Personal\\SideProjects\\WearableML\\TizenSensor\\TizenSensor.csproj",
+        "projectName": "TizenSensor",
+        "projectPath": "C:\\Users\\null\\Pictures\\Personal\\SideProjects\\WearableML\\TizenSensor\\TizenSensor.csproj",
+        "packagesPath": "C:\\Users\\null\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\null\\Pictures\\Personal\\SideProjects\\WearableML\\TizenSensor\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\null\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "tizen60"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "tizen60": {
+            "targetAlias": "tizen60",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "tizen60": {
+          "targetAlias": "tizen60",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "Tizen.NET": {
+              "include": "Compile, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0.15631, )",
+              "autoReferenced": true
+            },
+            "Tizen.Wearable.CircularUI": {
+              "target": "Package",
+              "version": "[1.5.0, )"
+            },
+            "TizenHotReloader": {
+              "target": "Package",
+              "version": "[1.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

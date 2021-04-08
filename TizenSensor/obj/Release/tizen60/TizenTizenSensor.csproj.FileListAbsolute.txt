@@ -1,0 +1,17 @@
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\TizenSensor.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Newtonsoft.Json.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Tizen.Wearable.CircularUI.Forms.Renderer.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Tizen.Wearable.CircularUI.Forms.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Xamarin.Forms.Core.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Xamarin.Forms.Platform.Tizen.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Xamarin.Forms.Platform.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\bin\Xamarin.Forms.Xaml.dll
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\TizenSensor.deps.json
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\lib\Client.cs
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\lib\NetworkUtil\Networking.cs
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\lib\NetworkUtil\SocketState.cs
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\lib\Sensor.cs
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\lib\SensorData.cs
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\shared\res\TizenSensor.png
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\tpkroot\tizen-manifest.xml
+C:\Users\null\Pictures\Personal\SideProjects\WearableML\TizenSensor\bin\Release\tizen60\org.tizen.example.TizenSensor-1.0.0.tpk

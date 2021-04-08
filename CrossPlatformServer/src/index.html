@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>WearableML Server</title>
+    <link rel="stylesheet" href="./bootstrap.min.css" />
+    <link rel="stylesheet" href="./index.css" />
+    <script defer src="./controller.js"></script>
+  </head>
+  <body>
+    <h3>Host address: <span id="addr-label"></span></h3>
+    <div id="disconnected-label">
+      Enter the above address into the Tizen Sensor
+    </div>
+    <div id="connected-label" class="hidden">Sensor connected</div>
+    <div id="running-label" class="hidden">
+      Recording... <span id="time-label"></span>
+    </div>
+    <br />
+    <br />
+    <div>
+      <button id="start-button" class="btn-outline-secondary" disabled>
+        Start
+      </button>
+    </div>
+  </body>
+</html>
