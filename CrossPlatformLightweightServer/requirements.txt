@@ -1,0 +1,4 @@
+google_cloud_speech
+google_cloud_storage
+pyaudio
+pyinstaller
