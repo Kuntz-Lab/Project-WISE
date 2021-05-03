@@ -7,16 +7,18 @@ audio.
 
 Project WISE -- Wearable-ML
 Qianlang Chen and Kevin Song
-U 05/02/21
+M 05/03/21
 '''
 
 from google.cloud import speech, storage
-import os
 from os import path
 import wave
 
-_CREDENTIAL_ENV_NAME = 'GOOGLE_APPLICATION_CREDENTIALS'
 _BUCKET_NAME = 'wearable-ml-recorded-audio'
+
+_speech_client: speech.SpeechClient
+_storage_client: storage.Client
+_storage_bucket: storage.Bucket
 
 def start(credential_path: str):
     '''
@@ -26,9 +28,13 @@ def start(credential_path: str):
     if not path.exists(credential_path):
         raise FileNotFoundError(
             f'Credential does not exist: \'{credential_path}\'')
-    os.environ[_CREDENTIAL_ENV_NAME] = credential_path
+    global _speech_client, _storage_client, _storage_bucket
+    _speech_client = speech.SpeechClient.from_service_account_json(
+        credential_path)
+    _storage_client = storage.Client.from_service_account_json(credential_path)
+    _storage_bucket = _storage_client.bucket(_BUCKET_NAME)
 
-_URI_FORMAT = 'gs://{bucket_name}/{file_name}'
+_URI_FORMAT = f'gs://{_BUCKET_NAME}/{{file_name}}'
 _MAX_NUM_WORDS_IN_LINE = 12
 _LINE_INTERVAL = 500 # ms
 '''
@@ -46,7 +52,8 @@ def transcribe(source_audio_path: str, target_srt_path: str):
     name = path.basename(source_audio_path)
     # Upload the audio to Google Cloud Storage (GCS), which is required for
     # audios longer than 1 minute
-    blob = storage.Client().get_bucket(_BUCKET_NAME).blob(name)
+    global _speech_client, _storage_bucket
+    blob = _storage_bucket.blob(name)
     blob.upload_from_filename(source_audio_path)
     # Request an online transcription which blocks the process
     with wave.open(source_audio_path, 'rb') as audio: # rb for read binary
@@ -56,10 +63,9 @@ def transcribe(source_audio_path: str, target_srt_path: str):
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         language_code='en-US',
         sample_rate_hertz=frame_rate)
-    uri = _URI_FORMAT.format(bucket_name=_BUCKET_NAME, file_name=name)
-    audio = speech.RecognitionAudio(uri=uri)
-    response = speech.SpeechClient().long_running_recognize(
-        config=config, audio=audio).result()
+    audio = speech.RecognitionAudio(uri=_URI_FORMAT.format(file_name=name))
+    response = _speech_client.long_running_recognize(config=config,
+                                                     audio=audio).result()
     # Delete the uploaded audio to save cloud storage
     blob.delete()
     # Store the transcription
@@ -69,31 +75,31 @@ def transcribe(source_audio_path: str, target_srt_path: str):
     with open(target_srt_path, 'w') as target:
         for res in response.results:
             for word_data in res.alternatives[0].words:
-                word_start_time = word_end_time = 0
-                word_start_time += word_data.start_time.seconds * 10**3
-                word_start_time += word_data.start_time.microseconds // 10**3
-                word_end_time += word_data.end_time.seconds * 10**3
-                word_end_time += word_data.end_time.microseconds // 10**3
-                if (len(line) >= _MAX_NUM_WORDS_IN_LINE or line and
+                word_start_time = (word_data.start_time.seconds * 10**3 +
+                                   word_data.start_time.microseconds // 10**3)
+                word_end_time = (word_data.end_time.seconds * 10**3 +
+                                 word_data.end_time.microseconds // 10**3)
+                if (len(line) == _MAX_NUM_WORDS_IN_LINE or line and
                         word_start_time - line_end_time >= _LINE_INTERVAL):
-                    _writeLine(target, line, line_index, line_start_time,
-                               line_end_time)
+                    _write_line(target, line, line_index, line_start_time,
+                                line_end_time)
                     line.clear()
                     line_index += 1
                     line_start_time = word_start_time
                 line.append(word_data.word)
                 line_end_time = word_end_time
         if line:
-            _writeLine(target, line, line_index, line_start_time, line_end_time)
+            _write_line(target, line, line_index, line_start_time,
+                        line_end_time)
 
-def _writeLine(target, line, index, startTime, endTime):
+def _write_line(target, line, index, start_time, end_time):
     target.write(f'{index}\n')
-    start = _formatTime(startTime)
-    end = _formatTime(endTime)
+    start = _format_time(start_time)
+    end = _format_time(end_time)
     target.write(f'{start} --> {end}\n')
     target.write(' '.join(line) + '\n\n')
 
-def _formatTime(millis):
+def _format_time(millis):
     h = millis // (3600 * 10**3)
     m = millis // (60 * 10**3) % 60
     s = millis // 10**3 % 60

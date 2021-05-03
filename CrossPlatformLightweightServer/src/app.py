@@ -1,18 +1,17 @@
 '''
-Application entry point and main controller.
+Application entry point.
 
 Project WISE -- Wearable-ML
 Qianlang Chen and Kevin Song
-U 05/02/21
+M 05/03/21
 '''
 
 from model import audio_transcriber
+from view import main_gui
 
 def start():
-    audio_transcriber.start('dist/wearable-ml-ff8f2f105b71.json')
-    audio_transcriber.transcribe('records/jensen.wav', 'records/jensen.srt')
-    # audio_transcriber.transcribe('records/experience-proves-this.wav',
-    #                              'records/experience-proves-this.srt')
+    # audio_transcriber.start('wearable-ml-ff8f2f105b71.json')
+    main_gui.start()
 
 if __name__ == '__main__':
     start()
