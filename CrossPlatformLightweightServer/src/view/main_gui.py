@@ -12,8 +12,11 @@ from os import path
 import PySimpleGUI
 import webbrowser
 
+_gui: PySimpleGUI.Window
+
 def start():
-    gui = PySimpleGUI.Window(
+    global _gui
+    _gui = PySimpleGUI.Window(
         background_color='#101010',
         button_color='#606060',
         element_justification='c',
@@ -44,7 +47,7 @@ def start():
                                   justification='c',
                                   key='progress_text',
                                   pad=(0, 0),
-                                  size=(6, None),
+                                  size=(18, None),
                                   text='0%',
                                   text_color='#606060'),),
                 (PySimpleGUI.ProgressBar(bar_color=('#404040', '#000000'),
@@ -55,28 +58,42 @@ def start():
         title='Transcribe Audio')
     credential_path = source_path = target_path = None
     while True:
-        event, values = gui.read()
+        event, values = _gui.read()
         if event == PySimpleGUI.WIN_CLOSED: break
         if event == 'credential_button':
             credential_path = values['credential_button']
-            gui['credential_button'].update('Credential: ' +
-                                            path.basename(credential_path))
+            _gui['credential_button'].update('Credential: ' +
+                                             path.basename(credential_path))
         elif event == 'source_button':
             source_path = values['source_button']
-            gui['source_button'].update('Source: ' + path.basename(source_path))
+            _gui['source_button'].update('Source: ' +
+                                         path.basename(source_path))
         elif event == 'target_button':
             target_path = values['target_button']
-            gui['target_button'].update('Target: ' + path.basename(target_path))
+            _gui['target_button'].update('Target: ' +
+                                         path.basename(target_path))
         elif event == 'transcribe_button':
-            gui['transcribe_button'].update(button_color='#202020',
-                                            disabled=True)
-            gui['progress_bar'].update(0)
-            gui['progress_text'].update('0%')
+            for button in ('credential', 'source', 'target', 'transcribe'):
+                _gui[button + '_button'].update(button_color='#202020',
+                                                disabled=True)
+            _gui['progress_text'].update('0%')
+            _gui['progress_bar'].update(0)
             audio_transcriber.start(credential_path)
-            audio_transcriber.transcribe(source_path, target_path)
-            gui['progress_bar'].update(1)
-            gui['progress_text'].update('100%')
+            audio_transcriber.transcribe(source_path, target_path,
+                                         _on_audio_transcriber_progress)
+            for button in ('credential', 'source', 'target', 'transcribe'):
+                _gui[button + '_button'].update(button_color='#606060',
+                                                disabled=False)
+            _gui['progress_text'].update('Done! 100%')
+            _gui['progress_bar'].update(1)
             webbrowser.open(path.dirname(target_path))
         if credential_path and source_path and target_path:
-            gui['transcribe_button'].update(button_color='#606060',
-                                            disabled=False)
+            _gui['transcribe_button'].update(button_color='#606060',
+                                             disabled=False)
+
+def _on_audio_transcriber_progress(stage, progress):
+    global _gui
+    if stage == 'upload': progress_stage = 'Uploading...'
+    elif stage == 'transcribe': progress_stage = 'Transcribing...'
+    _gui['progress_text'].update(progress_stage + f' {progress:.0%}')
+    _gui['progress_bar'].update(progress)
