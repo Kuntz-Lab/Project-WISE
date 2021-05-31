@@ -15,6 +15,7 @@
 
     <PropertyGroup>
         <ProjectTypeGuids>{B484D2DE-331C-4CA2-B931-2B4BDAD9945F}</ProjectTypeGuids>
+        <Version>1.0.1</Version>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(Configuration)' != 'Release'">

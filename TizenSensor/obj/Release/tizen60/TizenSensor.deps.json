@@ -7,7 +7,7 @@
   "targets": {
     "Tizen,Version=v6.0": {},
     "Tizen,Version=v6.0/": {
-      "TizenSensor/1.0.0": {
+      "TizenSensor/1.0.1": {
         "dependencies": {
           "Newtonsoft.Json": "12.0.3",
           "Tizen.NET": "8.0.0.15631",
@@ -75,7 +75,7 @@
     }
   },
   "libraries": {
-    "TizenSensor/1.0.0": {
+    "TizenSensor/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

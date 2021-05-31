@@ -1,13 +1,14 @@
 ﻿using NetworkUtil;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 
 namespace TizenSensor.lib
 {
+	/// <summary>
+	/// A CS 3500 TCP Client. Call <c>Client.Create()</c> instead of using the constructor to create a new Client
+	/// instance.
+	/// </summary>
 	public class Client
 	{
 		public const int Port = 6912;
