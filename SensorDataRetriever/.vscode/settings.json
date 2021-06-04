@@ -1,0 +1,15 @@
+{
+  "[python]": {
+    "editor.tabSize": 4
+  },
+  "cSpell.words": ["Qianlang", "Tizen", "pyinstaller"],
+  "code-runner.executorMap": {
+    "python": "conda activate pwr; python src/app.py"
+  },
+  "python.analysis.extraPaths": ["src"],
+  "python.formatting.provider": "yapf",
+  "python.formatting.yapfArgs": [
+    "--style={BASED_ON_STYLE: google, BLANK_LINES_AROUND_TOP_LEVEL_DEFINITION: 1, BLANK_LINE_BEFORE_NESTED_CLASS_OR_DEF: 0, COLUMN_LIMIT: 96, CONTINUATION_INDENT_WIDTH: 4, INDENT_BLANK_LINES: true, INDENT_WIDTH: 4, JOIN_MULTIPLE_LINES: true, SPACES_BEFORE_COMMENT: 1, SPLIT_COMPLEX_COMPREHENSION: true}"
+  ],
+  "terminal.integrated.inheritEnv": false
+}
