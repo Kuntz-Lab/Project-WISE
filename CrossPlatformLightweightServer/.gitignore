@@ -1,4 +1,5 @@
-.vscode
 __pycache__
-build
-records
+/.vscode
+/build
+/dist
+/records
