@@ -2,7 +2,7 @@
   "[python]": {
     "editor.tabSize": 4
   },
-  "cSpell.words": ["Qianlang", "Tizen", "pyinstaller"],
+  "cSpell.words": ["Qianlang", "Tizen", "isnan", "pyinstaller"],
   "code-runner.executorMap": {
     "python": "conda activate pwr; python src/app.py"
   },
