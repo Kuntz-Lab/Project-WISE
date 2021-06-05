@@ -3,9 +3,13 @@
 /// Kevin Song (U1211977)
 /// Qianlang Chen (U1172983)
 /// 
+/// Updated A 06/05/21
+/// 
 /// v1.0 (H 11/07/19)
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -14,6 +18,15 @@ namespace NetworkUtil
 {
 	public static class Networking
 	{
+		public static IPAddress GetIPAddress()
+		{
+			var host = Dns.GetHostEntry(Dns.GetHostName());
+			foreach (var ip in host.AddressList)
+				if (ip.AddressFamily == AddressFamily.InterNetwork)
+					return ip;
+			return null;
+		}
+
 		/////////////////////////////////////////////////////////////////////////////////////////
 		// Server-Side Code
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -300,7 +313,7 @@ namespace NetworkUtil
 		/// <returns>True if the send process was started, false if an error occurs or the socket is already closed</returns>
 		public static bool Send(Socket socket, string data)
 		{
-			return SendInternal(socket, data, SendCallback);
+			return SendInternal(socket, Encoding.UTF8.GetBytes(data), SendCallback);
 		}
 
 		/// <summary>
@@ -341,7 +354,14 @@ namespace NetworkUtil
 		/// <returns>True if the send process was started, false if an error occurs or the socket is already closed</returns>
 		public static bool SendAndClose(Socket socket, string data)
 		{
-			return SendInternal(socket, data, SendAndCloseCallback);
+			return SendInternal(socket, Encoding.UTF8.GetBytes(data), SendAndCloseCallback);
+		}
+
+		public static bool SendAndClose(Socket socket, params byte[][] data)
+		{
+			IEnumerable<byte> allData = new byte[0];
+			foreach (byte[] chunk in data) allData = allData.Concat(chunk);
+			return SendInternal(socket, allData.ToArray(), SendAndCloseCallback);
 		}
 
 		/// <summary>
@@ -394,13 +414,11 @@ namespace NetworkUtil
 		/// If an error occurs during the sending process, the socket is closed silently.
 		/// </summary>
 		/// <param name="socket">The target socket to send the data.</param>
-		/// <param name="data">The data to send.</param>
+		/// <param name="messageBytes">The data to send.</param>
 		/// <param name="callback"></param>
 		/// <returns>The custom callback to finalize the send process.</returns>
-		private static bool SendInternal(Socket socket, string data, AsyncCallback callback)
+		private static bool SendInternal(Socket socket, byte[] messageBytes, AsyncCallback callback)
 		{
-			byte[] messageBytes = Encoding.UTF8.GetBytes(data);
-
 			try
 			{
 				socket.BeginSend(messageBytes, 0, messageBytes.Length, SocketFlags.None, callback, socket);

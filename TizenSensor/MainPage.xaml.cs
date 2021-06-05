@@ -18,10 +18,9 @@ namespace TizenSensor
 		{
 			InitializeComponent();
 
-			Sensor.Create(HandleSensorCreated, HandleSensorUpdated);
-			Recorder.Create(HandleRecorderCreated);
-
 			startButton.Clicked += HandleStartButtonClicked;
+
+			Sensor.Create(HandleSensorCreated, HandleSensorUpdated);
 		}
 
 		protected Sensor sensor;
@@ -38,7 +37,7 @@ namespace TizenSensor
 				return;
 			}
 			this.sensor = sensor;
-			if (!(recorder is null)) startButton.IsEnabled = true;
+			Recorder.Create(HandleRecorderCreated);
 		}
 
 		protected void HandleRecorderCreated(Recorder recorder)
@@ -55,7 +54,13 @@ namespace TizenSensor
 				.GetAbsolutePath(DirectoryType.Documents);
 			recordDirectoryPath = Path.Combine(documentsPath, "Wearable-ML-Records");
 			Directory.CreateDirectory(recordDirectoryPath);
-			if (!(sensor is null)) startButton.IsEnabled = true;
+			Server.Start(HandleServerStarted);
+			Device.BeginInvokeOnMainThread(() => startButton.IsEnabled = true);
+		}
+
+		protected void HandleServerStarted(string ipAddress)
+		{
+			Device.BeginInvokeOnMainThread(() => titleLabel.Text += '\n' + ipAddress);
 		}
 
 		protected void HandleStartButtonClicked(object sender, EventArgs e)

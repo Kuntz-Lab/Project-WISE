@@ -5,6 +5,8 @@
 			<Label
 				x:Name="titleLabel"
 				Text="Wearable-ML"
+				FontSize="Micro"
+				HorizontalTextAlignment="Center"
 				VerticalOptions="CenterAndExpand"
 				HorizontalOptions="CenterAndExpand"
 			/>

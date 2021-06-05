@@ -59,6 +59,10 @@
             "Tizen.Wearable.CircularUI": {
               "target": "Package",
               "version": "[1.5.0, )"
+            },
+            "TizenHotReloader": {
+              "target": "Package",
+              "version": "[1.0.0, )"
             }
           },
           "imports": [

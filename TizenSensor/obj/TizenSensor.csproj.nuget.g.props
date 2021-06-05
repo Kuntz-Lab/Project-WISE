@@ -20,4 +20,7 @@
     <Import Project="$(NuGetPackageRoot)tizen.net\8.0.0.15631\build\tizen40\Tizen.NET.props" Condition="Exists('$(NuGetPackageRoot)tizen.net\8.0.0.15631\build\tizen40\Tizen.NET.props')" />
     <Import Project="$(NuGetPackageRoot)xamarin.forms\4.6.0.967\buildTransitive\Xamarin.Forms.props" Condition="Exists('$(NuGetPackageRoot)xamarin.forms\4.6.0.967\buildTransitive\Xamarin.Forms.props')" />
   </ImportGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\null\.nuget\packages\microsoft.codeanalysis.analyzers\2.9.6</PkgMicrosoft_CodeAnalysis_Analyzers>
+  </PropertyGroup>
 </Project>

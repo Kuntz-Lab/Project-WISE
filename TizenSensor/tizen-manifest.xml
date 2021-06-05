@@ -12,6 +12,7 @@
         <privilege>http://tizen.org/privilege/healthinfo</privilege>
         <privilege>http://tizen.org/privilege/recorder</privilege>
         <privilege>http://tizen.org/privilege/mediastorage</privilege>
+        <privilege>http://tizen.org/privilege/internet</privilege>
     </privileges>
     <dependencies />
     <provides-appdefined-privileges />
