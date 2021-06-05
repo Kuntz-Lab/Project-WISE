@@ -3,7 +3,7 @@ Used to retrieve audio and sensor reading data from a Tizen Sensor.
 
 Project WISE -- Wearable-ML
 Qianlang Chen
-F 06/04/21
+A 06/05/21
 '''
 
 from collections.abc import Callable
@@ -14,7 +14,6 @@ import PySimpleGUI
 from PySimpleGUI import Button, Element, Input, Listbox, Text, Window
 from threading import Thread
 from urllib import request
-from urllib.error import URLError
 import webbrowser
 
 class App:
@@ -47,7 +46,10 @@ class Gui:
                               size=(24, 1),
                               text='Enter sensor address')
         Gui._address_input = Input(default_text='192.168.0.', key='address_input', size=(16, 1))
-        Gui._load_button = Button(button_text='Load', key='load_button', size=(6, 1))
+        Gui._load_button = Button(bind_return_key=True,
+                                  button_text='Load',
+                                  key='load_button',
+                                  size=(6, 1))
         Gui._file_list = Listbox(values=(),
                                  background_color='#e0e4f0',
                                  enable_events=True,
@@ -121,6 +123,7 @@ class Gui:
             elif event == 'deselect_all_button': Gui._handle_deselect_all_button_clicked()
             elif event == 'retrieve_button_handle': Gui._handle_retrieve_button_selected()
             elif event == 'delete_button': Gui._handle_delete_button_clicked()
+            else: print('Unhandled:', event, values)
     
     def _format_x_files(x):
         return f'{x:,} file{(x > 1) * "s"}'
@@ -170,7 +173,6 @@ class Gui:
                                  Gui._handle_retriever_retrieving_files)
         Gui._info_text.update(f'Preparing to retrieve...')
         Gui._retrieve_button.TKStringVar.set('')
-        Gui._retrieve_button_selection = ''
     
     def _handle_delete_button_clicked():
         Gui._disable_window(True)
@@ -217,10 +219,6 @@ class Gui:
                   if x not in Gui._file_list_selection))
         Gui._update_selection_indication(0)
 
-# TODO: remove these fake stuffs
-import random, time
-from threading import Timer
-
 class Retriever:
     _CONNECTION_FAILED_MESSAGE = 'Connection failed!'
     
@@ -233,7 +231,7 @@ class Retriever:
                 response = Retriever._request('list')
                 file_names = response.read().decode('utf-8').strip().split('\n')
                 on_got_files(None, tuple(sorted(file_names)))
-            except URLError:
+            except:
                 on_got_files(Retriever._CONNECTION_FAILED_MESSAGE, None)
         
         Thread(target=f).start()
@@ -259,7 +257,7 @@ class Retriever:
                             bytes_loaded += len(data)
                             on_retrieving_files(None, bytes_loaded / total_bytes)
                 on_retrieving_files(None, 1.)
-            except URLError:
+            except:
                 on_retrieving_files(Retriever._CONNECTION_FAILED_MESSAGE, math.nan)
         
         Thread(target=f).start()
@@ -272,69 +270,15 @@ class Retriever:
                     if response.read() != b'1':
                         on_deleted_files(Retriever._CONNECTION_FAILED_MESSAGE)
                 on_deleted_files(None)
-            except URLError:
+            except:
                 on_deleted_files(Retriever._CONNECTION_FAILED_MESSAGE)
         
         Thread(target=f).start()
     
     def _request(command, *args) -> HTTPResponse:
-        return Retriever._fake_request(command, *args)
         formatted_args = (len(args) > 0) * ':' + ','.join(map(str, args))
         print(f'http://{Retriever.address}:3456/{command}{formatted_args}')
         return request.urlopen(f'http://{Retriever.address}:3456/{command}{formatted_args}',
                                timeout=1)
-    
-    def _fake_request(command, arg=''):
-        time.sleep(random.random() * 2)
-        if not random.randint(0, 34): return request.urlopen('http://gorgeous-failure')
-        if command == 'list':
-            return request.urlopen(
-                'http://urlecho.appspot.com/echo?status=200&Content-Type=text%2Fhtml&body=21-02-21-12-31-15-Audio.wav%0A21-04-29-18-57-30-Sensor.csv%0A21-04-29-18-57-30-Audio.wav%0A20-10-31-02-14-10-Audio.wav%0A20-10-31-02-14-10-Sensor.csv%0A21-02-21-12-31-15-Sensor.csv%0A'
-            )
-        elif command == 'size':
-            return request.urlopen(
-                f'http://urlecho.appspot.com/echo?status=200&Content-Type=text%2Fhtml&body={(len(arg) + 1) * int(arg[3:5]) * 12}'
-            )
-        elif command == 'retrieve':
-            return request.urlopen(
-                f'http://urlecho.appspot.com/echo?status=200&Content-Type=text%2Fhtml&body={(arg + "%0a") * int(arg[3:5]) * 12}'
-            )
-        elif command == 'delete':
-            return request.urlopen(
-                f'http://urlecho.appspot.com/echo?status=200&Content-Type=text%2Fhtml&body=1')
-    
-    def _fake_get_files(on_got_files):
-        Timer(
-            random.random() * 2,
-            on_got_files,
-            (None if random.randint(0, 2) else Retriever._CONNECTION_FAILED_MESSAGE,
-             random.sample(
-                 ('haha.wav', 'haha.csv', 'wow.wav', 'wow.csv', 'bye.wav', 'bye.csv',
-                  'memes.wav', 'memes.csv', 'echo.wav', 'echo.csv', 'creativity.wav',
-                  'creativity.csv', 'less.wav', 'less.csv', 'orange.wav', 'orange.csv'),
-                 k=random.randint(0, 16))),
-        ).start()
-    
-    def _fake_retrieve_files(file_names: tuple[str], target_dir_path: str,
-                             on_retrieving_files: Callable[[str, float], None]):
-        def f(p):
-            if p >= 1.:
-                on_retrieving_files(None, 1.)
-                return
-            if math.isnan(p):
-                p = 0
-            else:
-                if not random.randint(0, 34):
-                    on_retrieving_files(Retriever._CONNECTION_FAILED_MESSAGE, math.nan)
-                    return
-                on_retrieving_files(None, p)
-            Timer(random.random() * 1 + .5, f, ((p or 0.) + random.random() * .25,)).start()
-        
-        f(math.nan)
-    
-    def _fake_delete_files(file_names: tuple[str], on_deleted_files: Callable[[str], None]):
-        Timer(
-            random.random() * 2, on_deleted_files,
-            (None if random.randint(0, 2) else Retriever._CONNECTION_FAILED_MESSAGE,)).start()
 
 if __name__ == '__main__': App.start()
