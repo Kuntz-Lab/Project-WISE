@@ -1,45 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading;
 
-using Tizen.Security;
 using Tizen.Sensor;
 
 namespace TizenSensor.lib
 {
+	/// <summary>
+	/// Captures and records readings from the watch's heart rate sensor, accelerometer, and gyroscope.
+	/// </summary>
 	public class Sensor
 	{
-		protected const string HealthInfoPermissionString = "http://tizen.org/privilege/healthinfo";
-
 		public static void Create(Action<Sensor> onCreated, Action<Sensor, SensorData> onUpdated)
 		{
-			var initPermission = PrivacyPrivilegeManager.CheckPermission(HealthInfoPermissionString);
-			if (initPermission == CheckResult.Allow)
-			{
-				onCreated(new Sensor(onUpdated));
-				return;
-			}
-			if (initPermission == CheckResult.Deny)
-			{
-				onCreated(null);
-				return;
-			}
-
-			if (!PrivacyPrivilegeManager.GetResponseContext(HealthInfoPermissionString).TryGetTarget(out var context))
-			{
-				onCreated(null);
-				return;
-			}
-
-			context.ResponseFetched += (sender, e) =>
-			{
-				if (e.result != RequestResult.AllowForever) onCreated(null);
-				else onCreated(new Sensor(onUpdated));
-			};
-			PrivacyPrivilegeManager.RequestPermission(HealthInfoPermissionString);
+			Permission.Check(
+				isAllowed => onCreated(isAllowed ? new Sensor(onUpdated) : null),
+				"http://tizen.org/privilege/healthinfo"
+			);
 		}
 
 		protected Sensor(Action<Sensor, SensorData> onUpdated)
@@ -66,13 +45,16 @@ namespace TizenSensor.lib
 			PausePolicy = SensorPausePolicy.None
 		};
 
+		protected StreamWriter recordWriter;
+
 		protected Stopwatch stopwatch = new Stopwatch();
 
-		public void Start(uint updateInterval)
+		public void Start(string recordFilePath, uint updateInterval)
 		{
 			if (IsRunning) return;
 
-			IsRunning = true;
+			recordWriter = new StreamWriter(recordFilePath);
+			recordWriter.WriteLine(SensorData.CsvHeader);
 			heartRateMonitor.Interval = updateInterval;
 			accelerometer.Interval = updateInterval;
 			gyroscope.Interval = updateInterval;
@@ -94,6 +76,8 @@ namespace TizenSensor.lib
 				stopwatch.Stop();
 				stopwatch.Reset();
 			}).Start();
+
+			IsRunning = true;
 		}
 
 		public void Stop()
@@ -101,6 +85,8 @@ namespace TizenSensor.lib
 			if (!IsRunning) return;
 
 			IsRunning = false;
+			recordWriter.Close();
+			recordWriter = null;
 			heartRateMonitor.Stop();
 			accelerometer.Stop();
 			gyroscope.Stop();
@@ -108,7 +94,7 @@ namespace TizenSensor.lib
 
 		protected void Update(long elapsedMilliseconds)
 		{
-			OnUpdated.Invoke(this, new SensorData
+			var data = new SensorData
 			{
 				Seconds = elapsedMilliseconds * .001F,
 				HeartRate = heartRateMonitor.HeartRate,
@@ -118,7 +104,10 @@ namespace TizenSensor.lib
 				AngularVelocityX = gyroscope.X,
 				AngularVelocityY = gyroscope.Y,
 				AngularVelocityZ = gyroscope.Z
-			});
+			};
+
+			recordWriter.WriteLine(data.ToCsvRow());
+			OnUpdated.Invoke(this, data);
 		}
 	}
 }

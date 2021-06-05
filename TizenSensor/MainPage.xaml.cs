@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+
+using Tizen.System;
 
 using TizenSensor.lib;
 
@@ -19,139 +18,85 @@ namespace TizenSensor
 		{
 			InitializeComponent();
 
-			addrEntry.Completed += OnAddrEntryCompleted;
-			if (Application.Current.Properties.TryGetValue("lastAddr", out object lastAddr))
-				addrEntry.Text = lastAddr as string;
-			gestureRecognizer.Tapped += OnGestureRecognizerTapped;
-			mainLayout.GestureRecognizers.Add(gestureRecognizer);
+			Sensor.Create(HandleSensorCreated, HandleSensorUpdated);
+			Recorder.Create(HandleRecorderCreated);
 
-			Sensor.Create(OnSensorCreated, OnSensorUpdated);
+			startButton.Clicked += HandleStartButtonClicked;
 		}
-
-		protected TapGestureRecognizer gestureRecognizer = new TapGestureRecognizer();
 
 		protected Sensor sensor;
 
-		protected Client client;
+		protected Recorder recorder;
 
-		protected bool isShowingDetails = false;
+		protected string recordDirectoryPath;
 
-		protected void OnSensorCreated(Sensor sensor)
+		protected void HandleSensorCreated(Sensor sensor)
 		{
 			if (sensor is null)
 			{
 				messageLabel.Text = "Permission failed!";
 				return;
 			}
-
 			this.sensor = sensor;
-			addrEntry.IsEnabled = true;
+			if (!(recorder is null)) startButton.IsEnabled = true;
 		}
 
-		protected void OnAddrEntryCompleted(object sender, EventArgs e)
+		protected void HandleRecorderCreated(Recorder recorder)
 		{
-			addrEntry.IsEnabled = false;
-			messageLabel.Text = "Connecting...";
-			Client.Connect(addrEntry.Text.Trim(), OnClientConnected, OnClientReceived, OnClientDisconnected);
+			if (recorder is null)
+			{
+				messageLabel.Text = "Permission failed!";
+				return;
+			}
+			this.recorder = recorder;
+			string documentsPath = StorageManager.Storages
+				.Where(x => x.StorageType == StorageArea.Internal)
+				.First()
+				.GetAbsolutePath(DirectoryType.Documents);
+			recordDirectoryPath = Path.Combine(documentsPath, "Wearable-ML-Records");
+			Directory.CreateDirectory(recordDirectoryPath);
+			if (!(sensor is null)) startButton.IsEnabled = true;
 		}
 
-		protected void OnClientConnected(Client client)
+		protected void HandleStartButtonClicked(object sender, EventArgs e)
 		{
-			if (client is null)
+			if (sensor.IsRunning)
 			{
 				Device.BeginInvokeOnMainThread(() =>
 				{
-					messageLabel.Text = "Connection failed!";
-					addrEntry.IsEnabled = true;
+					startButton.Text = "    Start    ";
+					messageLabel.Text = "Record saved";
 				});
-				return;
+				recorder.Stop();
+				sensor.Stop();
 			}
-
-			this.client = client;
-			Device.BeginInvokeOnMainThread(() =>
+			else
 			{
-				titleLabel.IsVisible = false;
-				addrEntry.IsVisible = false;
-				messageLabel.IsVisible = false;
-				instructionLabel.IsVisible = true;
-			});
-			// remember entered host address
-			Application.Current.Properties["lastAddr"] = addrEntry.Text.Trim();
-			Application.Current.SavePropertiesAsync();
-		}
-
-		protected void OnClientReceived(Client client, string data)
-		{
-			string[] command = data.Trim().Split();
-			switch (command[0])
-			{
-				case "start": // start <update_interval>
-					sensor.Start(uint.Parse(command[1]));
-					Device.BeginInvokeOnMainThread(() =>
-					{
-						instructionLabel.IsVisible = false;
-						dataLabel.IsVisible = true;
-						dataLabel.Text = "";
-					});
-					break;
-				case "stop":
-					sensor.Stop();
-					Device.BeginInvokeOnMainThread(() =>
-					{
-						instructionLabel.IsVisible = true;
-						dataLabel.IsVisible = false;
-					});
-					break;
-				default:
-					Console.WriteLine("Sensor: unknown server command: " + data);
-					break;
-			}
-		}
-
-		protected void OnClientDisconnected(Client client)
-		{
-			this.client = null;
-			sensor.Stop();
-			Device.BeginInvokeOnMainThread(() =>
-			{
-				titleLabel.IsVisible = true;
-				addrEntry.IsVisible = true;
-				addrEntry.IsEnabled = true;
-				messageLabel.IsVisible = true;
-				messageLabel.Text = "Disconnected!";
-				instructionLabel.IsVisible = false;
-				dataLabel.IsVisible = false;
-			});
-		}
-
-		protected void OnSensorUpdated(Sensor sensor, SensorData data)
-		{
-			client.Send(data.ToJson() + '\n');
-			Device.BeginInvokeOnMainThread(() =>
-			{
-				if (isShowingDetails)
+				Device.BeginInvokeOnMainThread(() =>
 				{
-					dataLabel.Text = $"Time elapsed:  {(int)data.Seconds / 60:0}:{(int)data.Seconds % 60:00}\n"
-					   + $"Heart rate:  {data.HeartRate} bpm\n"
-					   + $"X acceleration:  {data.AccelerationX:0.00} m/s²\n"
-					   + $"Y acceleration:  {data.AccelerationY:0.00} m/s²\n"
-					   + $"Z acceleration:  {data.AccelerationZ:0.00} m/s²\n"
-					   + $"X angular velocity:  {data.AngularVelocityX:0} °/s\n"
-					   + $"Y angular velocity:  {data.AngularVelocityY:0} °/s\n"
-					   + $"Z angular velocity:  {data.AngularVelocityZ:0} °/s";
+					startButton.Text = "    Stop    ";
+					messageLabel.Text = "Recording... 0:00";
+				});
+				string dateTime = Util.GetFormattedDateTime();
+				recorder.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Audio.wav"));
+				sensor.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Sensor.csv"), 50);
+			}
+		}
+
+		protected void HandleSensorUpdated(Sensor sensor, SensorData data)
+		{
+			Device.BeginInvokeOnMainThread(() =>
+			{
+				if (sensor.IsRunning)
+				{
+					messageLabel.Text = $"Recording... {Util.FormatTime((int)data.Seconds)}\n";
 				}
 				else
 				{
-					dataLabel.Text = "Sensor is running...\n\nTap to show/hide details";
+					startButton.Text = "    Start    ";
+					messageLabel.Text = "Record saved";
 				}
 			});
-		}
-
-		protected void OnGestureRecognizerTapped(object sender, EventArgs e)
-		{
-			if (!dataLabel.IsVisible) return;
-
-			isShowingDetails = !isShowingDetails;
 		}
 	}
 }

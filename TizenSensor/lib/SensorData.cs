@@ -1,16 +1,16 @@
 ﻿using Newtonsoft.Json;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace TizenSensor.lib
 {
+	/// <summary>
+	/// Represents one frame/update of sensor readings.
+	/// </summary>
 	[JsonObject(MemberSerialization.OptIn)]
 	public class SensorData
 	{
+		public const string CsvHeader = "seconds,heartRate,accelerationX,accelerationY,accelerationZ,angularVelocityX"
+			+ ",angularVelocityY,angularVelocityZ";
+
 		public static SensorData FromJson(string json)
 		{
 			return JsonConvert.DeserializeObject<SensorData>(json);
@@ -47,6 +47,12 @@ namespace TizenSensor.lib
 		public string ToJson()
 		{
 			return JsonConvert.SerializeObject(this);
+		}
+
+		public string ToCsvRow()
+		{
+			return $"{Seconds:0.00},{HeartRate},{AccelerationX:0.00},{AccelerationY:0.00},{AccelerationZ:0.00}"
+				+ $",{AngularVelocityX:0.0},{AngularVelocityY:0.0},{AngularVelocityZ:0.0}";
 		}
 	}
 }

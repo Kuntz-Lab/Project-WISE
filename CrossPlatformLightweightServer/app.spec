@@ -5,10 +5,7 @@ from PyInstaller.utils.hooks import collect_data_files
 block_cipher = None
 
 a = Analysis(
-    ['src\\app.py'],
-    pathex=[
-        'C:\\Users\\null\\Pictures\\Personal\\SideProjects\\Project-WISE\\CrossPlatformLightweightServer'
-    ],
+    ['src/app.py'],
     binaries=[],
     datas=collect_data_files('grpc'),
     hiddenimports=[],

@@ -17,7 +17,7 @@ from os import path
 import time
 import wave
 
-from typing import Callable
+from collections.abc import Callable
 
 _BUCKET_NAME = 'wearable-ml-recorded-audio'
 
@@ -51,7 +51,7 @@ more after the previous word.
 '''
 
 def transcribe(source_audio_path: str, target_srt_path: str,
-               progress_callback: Callable[[str, float], None]):
+               progress_callback: Callable[[str, float]]):
     '''
     Accesses Google to transcribe a WAV file at `source_audio_path` and stores
     the text transcript in SubRip Subtitle (SRT) format at `target_srt_path`.
