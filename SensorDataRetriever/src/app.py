@@ -3,7 +3,7 @@ Used to retrieve audio and sensor reading data from a Tizen Sensor.
 
 Project WISE -- Wearable-ML
 Qianlang Chen
-F 06/04/21
+A 06/05/21
 '''
 
 from collections.abc import Callable
@@ -96,7 +96,6 @@ class Gui:
                              element_justification='c',
                              element_padding=(9, 9),
                              font=(None, 16),
-                             keep_on_top=True,
                              layout=(
                                  (Gui._info_text,),
                                  (Gui._address_input, Gui._load_button),
@@ -174,7 +173,6 @@ class Gui:
                                  Gui._handle_retriever_retrieving_files)
         Gui._info_text.update(f'Preparing to retrieve...')
         Gui._retrieve_button.TKStringVar.set('')
-        Gui._retrieve_button_selection = ''
     
     def _handle_delete_button_clicked():
         Gui._disable_window(True)
