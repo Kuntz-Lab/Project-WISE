@@ -20,11 +20,7 @@ namespace NetworkUtil
 	{
 		public static IPAddress GetIPAddress()
 		{
-			var host = Dns.GetHostEntry(Dns.GetHostName());
-			foreach (var ip in host.AddressList)
-				if (ip.AddressFamily == AddressFamily.InterNetwork)
-					return ip;
-			return null;
+			return Tizen.Network.Connection.ConnectionManager.GetIPAddress(Tizen.Network.Connection.AddressFamily.IPv4);
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +36,7 @@ namespace NetworkUtil
 		/// <param name="port">The port to listen on</param>
 		public static TcpListener StartServer(Action<SocketState> toCall, int port)
 		{
-			var listener = new TcpListener(IPAddress.Any, port);
+			var listener = new TcpListener(GetIPAddress(), port);
 
 			try
 			{

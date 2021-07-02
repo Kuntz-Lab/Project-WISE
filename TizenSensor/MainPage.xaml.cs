@@ -54,6 +54,7 @@ namespace TizenSensor
 				.GetAbsolutePath(DirectoryType.Documents);
 			recordDirectoryPath = Path.Combine(documentsPath, "Wearable-ML-Records");
 			Directory.CreateDirectory(recordDirectoryPath);
+			Server.RecordDirectoryPath = recordDirectoryPath;
 			Server.Start(HandleServerStarted);
 			Device.BeginInvokeOnMainThread(() => startButton.IsEnabled = true);
 		}

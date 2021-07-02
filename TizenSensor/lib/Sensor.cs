@@ -94,6 +94,8 @@ namespace TizenSensor.lib
 
 		protected void Update(long elapsedMilliseconds)
 		{
+			if (!IsRunning) return;
+
 			var data = new SensorData
 			{
 				Seconds = elapsedMilliseconds * .001F,

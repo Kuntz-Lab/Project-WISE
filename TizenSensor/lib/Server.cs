@@ -26,7 +26,10 @@ namespace TizenSensor.lib
 					Networking.StartServer(HandleClientJoins, 3456);
 					onStarted(Networking.GetIPAddress().ToString());
 				},
-				"http://tizen.org/privilege/internet"
+				"http://tizen.org/privilege/internet",
+				"http://tizen.org/privilege/network.get",
+				"http://tizen.org/privilege/network.profile",
+				"http://tizen.org/privilege/network.set"
 			);
 		}
 
