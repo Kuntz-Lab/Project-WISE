@@ -3,7 +3,7 @@ Used to retrieve audio and sensor reading data from a Tizen Sensor.
 
 Project WISE -- Wearable-ML
 Qianlang Chen
-A 06/05/21
+F 07/02/21
 '''
 
 from collections.abc import Callable
@@ -172,6 +172,8 @@ class Gui:
         Retriever.retrieve_files(Gui._file_list_selection, Gui._retrieve_button_selection,
                                  Gui._handle_retriever_retrieving_files)
         Gui._info_text.update(f'Preparing to retrieve...')
+        # Set internal value for retrieve_button so it wouldn't report the previous selection
+        # when the user cancels the second prompt
         Gui._retrieve_button.TKStringVar.set('')
     
     def _handle_delete_button_clicked():
@@ -221,17 +223,20 @@ class Gui:
 
 class Retriever:
     _CONNECTION_FAILED_MESSAGE = 'Connection failed!'
+    _MAX_NUM_ATTEMPTS = 6
     
     address: str = None
-    _has_stopped = False
     
     def get_files(on_got_files: Callable[[str, tuple[str]], None]):
         def f():
-            try:
-                response = Retriever._request('list')
-                file_names = response.read().decode('utf-8').strip().split('\n')
-                on_got_files(None, tuple(sorted(file_names)))
-            except:
+            for _ in range(Retriever._MAX_NUM_ATTEMPTS):
+                try:
+                    response = Retriever._request('list')
+                    file_names = response.read().decode('utf-8').strip().split('\n')
+                    on_got_files(None, tuple(sorted(file_names)))
+                    break
+                except Exception as ex: print('Caught:', ex)
+            else:
                 on_got_files(Retriever._CONNECTION_FAILED_MESSAGE, None)
         
         Thread(target=f).start()
@@ -239,46 +244,69 @@ class Retriever:
     def retrieve_files(file_names: tuple[str], target_dir_path: str,
                        on_retrieving_files: Callable[[str, float], None]):
         def f():
-            try:
-                total_bytes = 0
-                for name in file_names:
-                    response = Retriever._request('size', name)
-                    total_bytes += int(response.read().decode('utf-8'))
-                on_retrieving_files(None, 0.)
-                bytes_loaded = 0
-                for name in file_names:
-                    response = Retriever._request('retrieve', name)
-                    target_path = path.join(target_dir_path, name)
-                    with open(target_path, 'wb') as target:
-                        while True:
-                            data = response.read(2**20)
-                            if not data: break
-                            target.write(data)
-                            bytes_loaded += len(data)
-                            on_retrieving_files(None, bytes_loaded / total_bytes)
-                on_retrieving_files(None, 1.)
-            except:
-                on_retrieving_files(Retriever._CONNECTION_FAILED_MESSAGE, math.nan)
+            total_bytes = 0
+            for name in file_names:
+                for _ in range(Retriever._MAX_NUM_ATTEMPTS):
+                    try:
+                        response = Retriever._request('size', name)
+                        total_bytes += int(response.read().decode('utf-8'))
+                        break
+                    except Exception as ex: print('Caught:', ex)
+                else:
+                    on_retrieving_files(Retriever._CONNECTION_FAILED_MESSAGE, math.nan)
+                    return
+            
+            on_retrieving_files(None, 0.)
+            bytes_loaded = max_bytes_loadoed = 0
+            for name in file_names:
+                for _ in range(Retriever._MAX_NUM_ATTEMPTS):
+                    try:
+                        old_bytes_loaded = bytes_loaded
+                        response = Retriever._request('retrieve', name)
+                        target_path = path.join(target_dir_path, name)
+                        with open(target_path, 'wb') as target:
+                            while True:
+                                data = response.read(2**20)
+                                if not data: break
+                                target.write(data)
+                                bytes_loaded += len(data)
+                                if bytes_loaded > max_bytes_loadoed:
+                                    max_bytes_loadoed = bytes_loaded
+                                    on_retrieving_files(None, bytes_loaded / (total_bytes or 1))
+                        break
+                    except Exception as ex:
+                        print('Caught:', ex)
+                        bytes_loaded = old_bytes_loaded
+                else:
+                    on_retrieving_files(Retriever._CONNECTION_FAILED_MESSAGE, math.nan)
+                    return
+            
+            on_retrieving_files(None, 1.)
         
         Thread(target=f).start()
     
     def delete_files(file_names: tuple[str], on_deleted_files: Callable[[str], None]):
         def f():
-            try:
-                for name in file_names:
-                    response = Retriever._request('delete', name)
-                    if response.read() != b'1':
-                        on_deleted_files(Retriever._CONNECTION_FAILED_MESSAGE)
-                on_deleted_files(None)
-            except:
-                on_deleted_files(Retriever._CONNECTION_FAILED_MESSAGE)
+            for name in file_names:
+                for _ in range(Retriever._MAX_NUM_ATTEMPTS):
+                    try:
+                        response = Retriever._request('delete', name)
+                        content = response.read()
+                        if content != b'1': raise Exception(f'Failed to delete: {content}')
+                        break
+                    except Exception as ex: print('Caught:', ex)
+                else:
+                    on_deleted_files(Retriever._CONNECTION_FAILED_MESSAGE)
+                    return
+            
+            on_deleted_files(None)
         
         Thread(target=f).start()
     
     def _request(command, *args) -> HTTPResponse:
         formatted_args = (len(args) > 0) * ':' + ','.join(map(str, args))
-        print(f'http://{Retriever.address}:3456/{command}{formatted_args}')
-        return request.urlopen(f'http://{Retriever.address}:3456/{command}{formatted_args}',
-                               timeout=1)
+        url = f'http://{Retriever.address}:3456/{command}{formatted_args}'
+        print('Open:', url)
+        return request.urlopen(url, timeout=1)
 
 if __name__ == '__main__': App.start()
