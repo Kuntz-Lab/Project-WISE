@@ -4,7 +4,7 @@ This document aims to serve as a guideline of how to collect data for the Wearab
 
 1. Record audio and sensor data, where you need a Samsung watch
 
-2. Retrieving the recorded audio and sensor data from the watch, where you need a computer and working Internet
+2. Retrieve the recorded audio and sensor data from the watch, where you need a computer and working Internet
 
 If you have any technical questions, please do not hesitate to reach out to us: Kevin (kevin.song@utah.edu) and Qianlang (qianlangchen@gmail.com).
 
