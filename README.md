@@ -24,13 +24,13 @@ This section explains how to record the data needed for our research.
 
    c. Launch the Galaxy Store app, search for "WearableML", and install the app with "WML" in the logo:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/record-1.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/record-1.png" width="216">
 
 3. Launch the downloaded WearableML Sensor app and accept all three permission prompts (for microphone, sensor, and storage).
 
 4. Press _Start_ to start the recording:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/record-2.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/record-2.png" width="216">
 
    - The recorded data includes microphone audio, heart rate, accelerometer, and gyroscope readings.
 
@@ -40,7 +40,7 @@ This section explains how to record the data needed for our research.
 
 5. Press _Stop_ to stop the recording:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/record-3.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/record-3.png" width="216">
 
 ---
 
@@ -54,11 +54,11 @@ This section explains how to collect the recorded data from the watch.
 
 3. Launch the WearableML Sensor app on the watch. Enter the IP address displayed under the text "Wearable-ML" into the retriever tool and click _Load_:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/retrieve-1.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/retrieve-1.png" width="432">
 
 4. Once the list of files are loaded in the retriever tool, select the files you want to retrieve:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/retrieve-2.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/retrieve-2.png" width="432">
 
    - Each recording consists of two files: a WAV file containing the microphone audio, paired with a CSV file containing the sensor readings.
 
@@ -84,10 +84,10 @@ This section explains how you may use our tool to access the Google Cloud Platfo
 
 3. Click the three buttons to upload the private key JSON, the source audio file (in WAV format), and a target location to store the transcription text file:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/transcribe-1.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/transcribe-1.png" height="432">
 
 4. Click _Transcribe_ and wait for the process to complete:
 
-   ![](https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/transcribe-2.png)
+   <img src="https://raw.githubusercontent.com/Utah-ARMLab/Project-WISE/master/Documents/Images/transcribe-2.png" height="432">
 
    - The uploading speed depends on your Internet, but the transcribing process should take about 8 minutes for a 30-minute audio.
