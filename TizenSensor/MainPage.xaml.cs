@@ -89,6 +89,17 @@ namespace TizenSensor
 			}
 		}
 
+		protected override bool OnBackButtonPressed()
+		{
+			if (sensor.IsRunning)
+			{
+				HandleStartButtonClicked(null, null);
+				return true;
+			}
+
+			return false;
+		}
+
 		protected void HandleSensorUpdated(Sensor sensor, SensorData data)
 		{
 			Device.BeginInvokeOnMainThread(() =>
