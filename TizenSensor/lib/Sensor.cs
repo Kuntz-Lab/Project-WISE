@@ -49,6 +49,8 @@ namespace TizenSensor.lib
 
 		protected Stopwatch stopwatch = new Stopwatch();
 
+		protected List<string> recordData = new List<string>();
+
 		public void Start(string recordFilePath, uint updateInterval)
 		{
 			if (IsRunning) return;
@@ -85,11 +87,17 @@ namespace TizenSensor.lib
 			if (!IsRunning) return;
 
 			IsRunning = false;
+			recordData.Clear();
 			recordWriter.Close();
 			recordWriter = null;
 			heartRateMonitor.Stop();
 			accelerometer.Stop();
 			gyroscope.Stop();
+		}
+
+		public List<string> GetData(int startIndex)
+		{
+			return recordData.GetRange(startIndex, recordData.Count - startIndex);
 		}
 
 		protected void Update(long elapsedMilliseconds)
@@ -108,7 +116,9 @@ namespace TizenSensor.lib
 				AngularVelocityZ = gyroscope.Z
 			};
 
-			recordWriter.WriteLine(data.ToCsvRow());
+			string csv = data.ToCsvRow();
+			recordData.Add(csv);
+			recordWriter.WriteLine(csv);
 			OnUpdated.Invoke(this, data);
 		}
 	}

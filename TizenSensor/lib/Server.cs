@@ -13,9 +13,12 @@ namespace TizenSensor.lib
 	public static class Server
 	{
 		private const string HttpOkHeader = "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n";
+
 		private const string HttpBadHeader = "HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n";
 
 		public static string RecordDirectoryPath { get; set; }
+
+		public static Sensor Sensor { get; set; }
 
 		public static void Start(Action<string> onStarted)
 		{
@@ -72,6 +75,17 @@ namespace TizenSensor.lib
 					case "delete":
 						File.Delete(Path.Combine(RecordDirectoryPath, args[0]));
 						Networking.SendAndClose(target, HttpOkHeader + '1');
+						break;
+
+					case "stream":
+						try
+						{
+							Networking.SendAndClose(target, HttpOkHeader + string.Join("\n", Sensor.GetData(int.Parse(args[0]))));
+						}
+						catch
+						{
+							Networking.SendAndClose(target, HttpOkHeader + "-1");
+						}
 						break;
 
 					default:
