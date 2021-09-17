@@ -19,6 +19,13 @@ namespace TizenSensor
 			InitializeComponent();
 
 			startButton.Clicked += HandleStartButtonClicked;
+			isRecorderOnButton.Clicked += HandleIsRecorderOnButtonClicked;
+			samplingRateButton.Clicked += HandleSamplingRateButtonClicked;
+
+			if (Application.Current.Properties.TryGetValue("isRecorderOnText", out object isRecorderOnText))
+				isRecorderOnButton.Text = isRecorderOnText as string;
+			if (Application.Current.Properties.TryGetValue("samplingRateText", out object samplingRateText))
+				samplingRateButton.Text = samplingRateText as string;
 
 			Sensor.Create(HandleSensorCreated, HandleSensorUpdated);
 		}
@@ -55,9 +62,12 @@ namespace TizenSensor
 			recordDirectoryPath = Path.Combine(documentsPath, "Wearable-ML-Records");
 			Directory.CreateDirectory(recordDirectoryPath);
 			Server.RecordDirectoryPath = recordDirectoryPath;
-			Server.Sensor = this.sensor;
+			Server.Sensor = sensor;
 			Server.Start(HandleServerStarted);
-			Device.BeginInvokeOnMainThread(() => startButton.IsEnabled = true);
+			Device.BeginInvokeOnMainThread(() =>
+			{
+				startButton.IsEnabled = isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = true;
+			});
 		}
 
 		protected void HandleServerStarted(string ipAddress)
@@ -73,8 +83,9 @@ namespace TizenSensor
 				{
 					startButton.Text = "    Start    ";
 					messageLabel.Text = "Record saved";
+					isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = true;
 				});
-				recorder.Stop();
+				if (isRecorderOnButton.Text == "Mic On") recorder.Stop();
 				sensor.Stop();
 			}
 			else
@@ -82,11 +93,13 @@ namespace TizenSensor
 				Device.BeginInvokeOnMainThread(() =>
 				{
 					startButton.Text = "    Stop    ";
-					messageLabel.Text = "Recording... 0:00";
+					messageLabel.Text = "0:00";
+					isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = false;
 				});
 				string dateTime = Util.GetFormattedDateTime();
-				recorder.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Audio.wav"));
-				sensor.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Sensor.csv"), 50);
+				if (isRecorderOnButton.Text == "Mic On") recorder.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Audio.wav"));
+				uint updateInterval = 1000 / uint.Parse(samplingRateButton.Text.Substring(0, 2));
+				sensor.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Sensor.csv"), updateInterval);
 			}
 		}
 
@@ -107,13 +120,33 @@ namespace TizenSensor
 			{
 				if (sensor.IsRunning)
 				{
-					messageLabel.Text = $"Recording... {Util.FormatTime((int)data.Seconds)}\n";
+					messageLabel.Text = Util.FormatTime((int)data.Seconds);
 				}
 				else
 				{
 					startButton.Text = "    Start    ";
 					messageLabel.Text = "Record saved";
 				}
+			});
+		}
+
+		protected void HandleIsRecorderOnButtonClicked(object sender, EventArgs e)
+		{
+			Device.BeginInvokeOnMainThread(() =>
+			{
+				if (isRecorderOnButton.Text == "Mic On") isRecorderOnButton.Text = "Mic Off";
+				else isRecorderOnButton.Text = "Mic On";
+				Application.Current.Properties["isRecorderOnText"] = isRecorderOnButton.Text;
+			});
+		}
+
+		protected void HandleSamplingRateButtonClicked(object sender, EventArgs e)
+		{
+			Device.BeginInvokeOnMainThread(() =>
+			{
+				if (samplingRateButton.Text == "20 FPS") samplingRateButton.Text = "40 FPS";
+				else samplingRateButton.Text = "20 FPS";
+				Application.Current.Properties["samplingRateText"] = samplingRateButton.Text;
 			});
 		}
 	}

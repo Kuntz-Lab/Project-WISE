@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Tizen.Sensor;
 
@@ -64,7 +65,7 @@ namespace TizenSensor.lib
 			accelerometer.Start();
 			gyroscope.Start();
 
-			new Thread(() =>
+			Task.Run(() =>
 			{
 				stopwatch.Start();
 				long lastReportTime = -updateInterval; // force immediate report
@@ -77,7 +78,7 @@ namespace TizenSensor.lib
 				}
 				stopwatch.Stop();
 				stopwatch.Reset();
-			}).Start();
+			});
 
 			IsRunning = true;
 		}

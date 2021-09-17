@@ -51,8 +51,8 @@ namespace TizenSensor.lib
 
 		public string ToCsvRow()
 		{
-			return $"{Seconds:0.00},{HeartRate},{AccelerationX:0.00},{AccelerationY:0.00},{AccelerationZ:0.00}"
-				+ $",{AngularVelocityX:0.0},{AngularVelocityY:0.0},{AngularVelocityZ:0.0}";
+			return $"{Seconds},{HeartRate},{AccelerationX},{AccelerationY},{AccelerationZ},{AngularVelocityX}"
+				+ $",{AngularVelocityY},{AngularVelocityZ}";
 		}
 	}
 }
