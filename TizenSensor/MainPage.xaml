@@ -22,13 +22,19 @@
 				<Button
 					x:Name="isRecorderOnButton"
 					FontSize="Micro"
-					Text="Mic On"
+					Text="Mic Off"
 					IsEnabled="False"
 				/>
 				<Button
 					x:Name="samplingRateButton"
 					FontSize="Micro"
-					Text="20 FPS"
+					Text="1 FPS"
+					IsEnabled="False"
+				/>
+				<Button
+					x:Name="locationTypeButton"
+					FontSize="Micro"
+					Text="Hybrid"
 					IsEnabled="False"
 				/>
 			</FlexLayout>
@@ -38,6 +44,7 @@
 				FontSize="Micro"
 				VerticalOptions="CenterAndExpand"
 				HorizontalOptions="CenterAndExpand"
+				HorizontalTextAlignment="Center"
 			/>
 		</StackLayout>
 	</ContentPage.Content>

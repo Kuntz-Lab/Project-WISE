@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 
+using Tizen.Location;
 using Tizen.System;
 
 using TizenSensor.lib;
@@ -17,15 +18,19 @@ namespace TizenSensor
 		public MainPage()
 		{
 			InitializeComponent();
+			Console.WriteLine("Locator.cs **app** starting...........................................................");
 
 			startButton.Clicked += HandleStartButtonClicked;
 			isRecorderOnButton.Clicked += HandleIsRecorderOnButtonClicked;
 			samplingRateButton.Clicked += HandleSamplingRateButtonClicked;
+			locationTypeButton.Clicked += HandleLocationTypeButtonClicked;
 
 			if (Application.Current.Properties.TryGetValue("isRecorderOnText", out object isRecorderOnText))
 				isRecorderOnButton.Text = isRecorderOnText as string;
 			if (Application.Current.Properties.TryGetValue("samplingRateText", out object samplingRateText))
 				samplingRateButton.Text = samplingRateText as string;
+			if (Application.Current.Properties.TryGetValue("locationTypeText", out object locationTypeText))
+				locationTypeButton.Text = locationTypeText as string;
 
 			Sensor.Create(HandleSensorCreated, HandleSensorUpdated);
 		}
@@ -66,7 +71,8 @@ namespace TizenSensor
 			Server.Start(HandleServerStarted);
 			Device.BeginInvokeOnMainThread(() =>
 			{
-				startButton.IsEnabled = isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = true;
+				startButton.IsEnabled = isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled
+					= locationTypeButton.IsEnabled = true;
 			});
 		}
 
@@ -83,7 +89,7 @@ namespace TizenSensor
 				{
 					startButton.Text = "    Start    ";
 					messageLabel.Text = "Record saved";
-					isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = true;
+					isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = locationTypeButton.IsEnabled = true;
 				});
 				if (isRecorderOnButton.Text == "Mic On") recorder.Stop();
 				sensor.Stop();
@@ -93,19 +99,21 @@ namespace TizenSensor
 				Device.BeginInvokeOnMainThread(() =>
 				{
 					startButton.Text = "    Stop    ";
-					messageLabel.Text = "0:00";
-					isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = false;
+					//messageLabel.Text = "0:00";
+					isRecorderOnButton.IsEnabled = samplingRateButton.IsEnabled = locationTypeButton.IsEnabled = false;
 				});
 				string dateTime = Util.GetFormattedDateTime();
 				if (isRecorderOnButton.Text == "Mic On") recorder.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Audio.wav"));
 				uint updateInterval = 1000 / uint.Parse(samplingRateButton.Text.Substring(0, 2));
-				sensor.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Sensor.csv"), updateInterval);
+				LocationType locationType = locationTypeButton.Text == "WPS" ? LocationType.Wps
+					: locationTypeButton.Text == "GPS" ? LocationType.Gps : LocationType.Hybrid;
+				sensor.Start(Path.Combine(recordDirectoryPath, $"{dateTime}-Sensor.csv"), updateInterval, locationType);
 			}
 		}
 
 		protected override bool OnBackButtonPressed()
 		{
-			if (sensor.IsRunning)
+			if (!(sensor is null) && sensor.IsRunning)
 			{
 				HandleStartButtonClicked(null, null);
 				return true;
@@ -118,6 +126,14 @@ namespace TizenSensor
 		{
 			Device.BeginInvokeOnMainThread(() =>
 			{
+				if (data.Message != "")
+				{
+					if (data.Seconds > 0) messageLabel.Text = $"{Util.FormatTime((int)data.Seconds)}\n{data.Message}";
+					else messageLabel.Text = data.Message;
+
+					return;
+				}
+
 				if (sensor.IsRunning)
 				{
 					messageLabel.Text = Util.FormatTime((int)data.Seconds);
@@ -144,9 +160,20 @@ namespace TizenSensor
 		{
 			Device.BeginInvokeOnMainThread(() =>
 			{
-				if (samplingRateButton.Text == "20 FPS") samplingRateButton.Text = "40 FPS";
+				if (samplingRateButton.Text == "20 FPS") samplingRateButton.Text = "1 FPS";
 				else samplingRateButton.Text = "20 FPS";
 				Application.Current.Properties["samplingRateText"] = samplingRateButton.Text;
+			});
+		}
+
+		protected void HandleLocationTypeButtonClicked(object sender, EventArgs e)
+		{
+			Device.BeginInvokeOnMainThread(() =>
+			{
+				if (locationTypeButton.Text == "Hybrid") locationTypeButton.Text = "GPS";
+				else if (locationTypeButton.Text == "GPS") locationTypeButton.Text = "WPS";
+				else locationTypeButton.Text = "Hybrid";
+				Application.Current.Properties["locationTypeText"] = locationTypeButton.Text;
 			});
 		}
 	}

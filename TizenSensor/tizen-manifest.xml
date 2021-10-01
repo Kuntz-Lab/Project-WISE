@@ -16,7 +16,11 @@
         <privilege>http://tizen.org/privilege/network.get</privilege>
         <privilege>http://tizen.org/privilege/network.profile</privilege>
         <privilege>http://tizen.org/privilege/network.set</privilege>
+        <privilege>http://tizen.org/privilege/location</privilege>
     </privileges>
     <dependencies />
     <provides-appdefined-privileges />
+    <feature name="http://tizen.org/feature/location">true</feature>
+    <feature name="http://tizen.org/feature/location.gps">true</feature>
+    <feature name="http://tizen.org/feature/location.wps">true</feature>
 </manifest>

@@ -30,15 +30,18 @@ namespace TizenSensor.lib
 			if (initPermission == CheckResult.Allow)
 			{
 				callback(true);
+				Console.WriteLine("Locator.cs **perm** allowed " + permissionString);
 				return;
 			}
 			if (initPermission == CheckResult.Deny)
 			{
+				Console.WriteLine("Locator.cs **perm** denied " + permissionString);
 				callback(false);
 				return;
 			}
 			if (!PrivacyPrivilegeManager.GetResponseContext(permissionString).TryGetTarget(out var context))
 			{
+				Console.WriteLine("Locator.cs **perm** said no to " + permissionString);
 				callback(false);
 				return;
 			}

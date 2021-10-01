@@ -16,8 +16,9 @@ namespace TizenSensor.lib
 			return JsonConvert.DeserializeObject<SensorData>(json);
 		}
 
-		public SensorData()
+		public SensorData(string message = "")
 		{
+			Message = message;
 		}
 
 		[JsonProperty(PropertyName = "seconds")]
@@ -43,6 +44,8 @@ namespace TizenSensor.lib
 
 		[JsonProperty(PropertyName = "angularVelocityZ")]
 		public float AngularVelocityZ { get; set; }
+
+		public string Message { get; set; }
 
 		public string ToJson()
 		{
