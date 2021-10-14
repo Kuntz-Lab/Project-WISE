@@ -13,31 +13,10 @@
 			<Button
 				x:Name="startButton"
 				FontSize="Header"
-				Text="    Start    "
-				IsEnabled="False"
+				Text="      Start      "
 				VerticalOptions="CenterAndExpand"
 				HorizontalOptions="CenterAndExpand"
 			/>
-			<FlexLayout JustifyContent="Center">
-				<Button
-					x:Name="isRecorderOnButton"
-					FontSize="Micro"
-					Text="Mic Off"
-					IsEnabled="False"
-				/>
-				<Button
-					x:Name="samplingRateButton"
-					FontSize="Micro"
-					Text="1 FPS"
-					IsEnabled="False"
-				/>
-				<Button
-					x:Name="locationTypeButton"
-					FontSize="Micro"
-					Text="Hybrid"
-					IsEnabled="False"
-				/>
-			</FlexLayout>
 			<Label 
 				x:Name="messageLabel"
 				Text="Sensor ready"

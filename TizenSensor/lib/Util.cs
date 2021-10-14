@@ -10,12 +10,14 @@ namespace TizenSensor.lib
 	{
 		public static string FormatTime(int seconds)
 		{
+			if (seconds < 0) return $"-{FormatTime(-seconds)}";
+
 			return $"{seconds / 60:0}:{seconds % 60:00}";
 		}
 
-		public static string GetFormattedDateTime()
+		public static string GetFormattedDateTime(DateTime dateTime)
 		{
-			return DateTime.Now.ToString("yy-MM-dd-HH-mm-ss");
+			return dateTime.ToString("yy-MM-dd-HH-mm-ss");
 		}
 	}
 }

@@ -1,12 +1,10 @@
 ﻿using NetworkUtil;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TizenSensor.lib
 {
@@ -18,11 +16,11 @@ namespace TizenSensor.lib
 
 		public static string RecordDirectoryPath { get; set; }
 
-		public static Sensor Sensor { get; set; }
+		public static SensorRecorder Sensor { get; set; }
 
 		public static void Start(Action<string> onStarted)
 		{
-			Permission.Check(
+			PermissionManager.GetPermissions(
 				allowed =>
 				{
 					if (!allowed) return;
@@ -77,16 +75,16 @@ namespace TizenSensor.lib
 						Networking.SendAndClose(target, HttpOkHeader + '1');
 						break;
 
-					case "stream":
-						try
-						{
-							Networking.SendAndClose(target, HttpOkHeader + string.Join("\n", Sensor.GetData(int.Parse(args[0]))));
-						}
-						catch
-						{
-							Networking.SendAndClose(target, HttpOkHeader + "-1");
-						}
-						break;
+					//case "stream":
+					//	try
+					//	{
+					//		Networking.SendAndClose(target, HttpOkHeader + string.Join("\n", Sensor.GetData(int.Parse(args[0]))));
+					//	}
+					//	catch
+					//	{
+					//		Networking.SendAndClose(target, HttpOkHeader + "-1");
+					//	}
+					//	break;
 
 					default:
 						throw new ArgumentException("Unknown command: " + command);
