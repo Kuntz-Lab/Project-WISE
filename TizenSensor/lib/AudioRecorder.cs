@@ -7,20 +7,20 @@ namespace TizenSensor.lib
 	/// <summary>
 	/// Captures and records audio from the watch's microphone.
 	/// </summary>
-	public class Recorder
+	public class AudioRecorder
 	{
-		public static void Create(Action<Recorder> onCreated)
+		public static void Create(Action<AudioRecorder> onCreated)
 		{
-			Permission.Check(
-				isAllowed => onCreated(isAllowed ? new Recorder() : null),
+			PermissionManager.GetPermissions(
+				isAllowed => onCreated(isAllowed ? new AudioRecorder() : null),
 				"http://tizen.org/privilege/recorder",
 				"http://tizen.org/privilege/mediastorage"
 			);
 		}
 
-		protected Recorder()
+		protected AudioRecorder()
 		{
-			audioRecorder = new AudioRecorder(RecorderAudioCodec.Pcm, RecorderFileFormat.Wav)
+			audioRecorder = new Tizen.Multimedia.AudioRecorder(RecorderAudioCodec.Pcm, RecorderFileFormat.Wav)
 			{
 				AudioDevice = RecorderAudioDevice.Mic,
 				AudioSampleRate = 16000,
@@ -30,7 +30,7 @@ namespace TizenSensor.lib
 
 		public bool IsRunning { get; protected set; } = false;
 
-		protected AudioRecorder audioRecorder;
+		protected Tizen.Multimedia.AudioRecorder audioRecorder;
 
 		public void Start(string recordFilePath)
 		{

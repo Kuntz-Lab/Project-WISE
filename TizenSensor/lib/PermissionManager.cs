@@ -7,26 +7,26 @@ namespace TizenSensor.lib
 	/// <summary>
 	/// Provides functions to check or ask the user for certain permissions.
 	/// </summary>
-	public class Permission
+	public class PermissionManager
 	{
-		public static void Check(Action<bool> callback, params string[] permissionStrings)
+		public static void GetPermissions(Action<bool> onGotPermissions, params string[] permissions)
 		{
-			int numPending = permissionStrings.Length;
+			int numPending = permissions.Length;
 			bool areAllAllowed = true;
-			foreach (string permissionString in permissionStrings)
+			foreach (string permissionString in permissions)
 			{
 				Check(permissionString, isAllowed =>
 				{
 					areAllAllowed &= isAllowed;
 					numPending--;
-					if (numPending == 0) callback(areAllAllowed);
+					if (numPending == 0) onGotPermissions(areAllAllowed);
 				});
 			}
 		}
 
-		protected static void Check(string permissionString, Action<bool> callback)
+		protected static void Check(string permission, Action<bool> callback)
 		{
-			var initPermission = PrivacyPrivilegeManager.CheckPermission(permissionString);
+			var initPermission = PrivacyPrivilegeManager.CheckPermission(permission);
 			if (initPermission == CheckResult.Allow)
 			{
 				callback(true);
@@ -37,13 +37,13 @@ namespace TizenSensor.lib
 				callback(false);
 				return;
 			}
-			if (!PrivacyPrivilegeManager.GetResponseContext(permissionString).TryGetTarget(out var context))
+			if (!PrivacyPrivilegeManager.GetResponseContext(permission).TryGetTarget(out var context))
 			{
 				callback(false);
 				return;
 			}
 			context.ResponseFetched += (sender, e) => callback(e.result == RequestResult.AllowForever);
-			PrivacyPrivilegeManager.RequestPermission(permissionString);
+			PrivacyPrivilegeManager.RequestPermission(permission);
 		}
 	}
 }
